@@ -1,0 +1,25 @@
+[{
+"id":0,
+"name":"iphone",
+"color":"black",
+"price":990,
+"height":"90cm",
+"camera":"600PX"
+},
+{
+    "id":1,
+    "name":"iphone x",
+    "color":"black and white",
+    "price":9900,
+    "height":"99cm",
+    "camera":"900PX"
+}
+,{
+    "id":2,
+    "name":"iphone xs",
+    "color":"black and white",
+    "price":8900,
+    "height":"92cm",
+    "camera":"800PX"
+}
+]
