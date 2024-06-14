@@ -54,7 +54,7 @@ import React, { useState,useRef } from "react";
     };
 
     return (
-        <div>
+        <>
             <form onSubmit={submitHandler}>
                 <div>
                     <label htmlFor="name">Movie Name</label>
@@ -79,7 +79,7 @@ import React, { useState,useRef } from "react";
                 <button type="submit">Add Movie</button>
                 <button onClick={()=>{props.showForm(false)}}>Cancel</button>
             </form>
-        </div>
+        </>
     );
 };
 

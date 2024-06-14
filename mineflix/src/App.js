@@ -108,13 +108,13 @@ function App() {
     }
 
     return (
-    <div className="App">
+    <>
       <Nav />
           <Home />
             <CreateProduct createProduct={addProduct} />
             <FilterProduct filterValue={ filter} />
            <ProductList newMovie={filterMovie} />
-    </div>
+    </>
   );
 }
 export default App;
