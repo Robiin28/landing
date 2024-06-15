@@ -24,12 +24,12 @@ const Modal = (props) => {
     left: '0',
     width: '100%',
     height: '100%',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Slightly reduce the opacity for a better blur effect
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     zIndex: '1000',
     transition: 'opacity 0.3s ease, visibility 0.3s ease',
     opacity: props.showModal ? 1 : 0,
     visibility: props.showModal ? 'visible' : 'hidden',
-    pointerEvents: props.showModal ? 'auto' : 'none', // Prevents interaction when hidden
+    pointerEvents: props.showModal ? 'auto' : 'none', 
     backdropFilter: props.showModal ? 'blur(8px)' : 'none', // Apply blur effect
     WebkitBackdropFilter: props.showModal ? 'blur(10px)' : 'none', // Safari support
   };
