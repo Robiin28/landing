@@ -1,24 +1,25 @@
-
-import React,{useState} from "react";
-import Modal from "./Modal";
+import React, { useState } from "react";
+import Modal from "./Modal"; // Ensure this component is properly defined
 import ReactDOM from "react-dom";
 
-
 function Nav() {
- let[showModel,updateShowModel]=useState(false);
-     function displayModel(){
-         updateShowModel(true);
-        }
-        function hideModal(){
-          updateshowModal(false);
-        }
+  const [showModal, setShowModal] = useState(false);
+
+  function displayModal() {
+    setShowModal(true);
+  }
+
+  function hideModal() {
+    setShowModal(false);
+  }
+
   return ReactDOM.createPortal(
     <>
-    <h1>helllooo nav</h1>
-    <button onClick={displayModel}>show Model</button>
-    <Modal showModal={showModal} hideModal={hideModal}></Modal>
+      <h1>Hello Nav</h1>
+      <button onClick={displayModal}>Show Modal</button>
+      <Modal showModal={showModal} hideModal={hideModal} />
     </>,
-    document.getElementById('footer')
+    document.getElementById('footer') // Ensure this element exists in your HTML
   );
 }
 
