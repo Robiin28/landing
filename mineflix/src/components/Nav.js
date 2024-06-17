@@ -15,7 +15,7 @@ function Nav() {
 
   return ReactDOM.createPortal(
     <>
-      <h1>Hello Nav</h1>
+      <h1>Nav</h1>
       <button onClick={displayModal}>Show Modal</button>
       <Modal showModal={showModal} hideModal={hideModal} />
     </>,
