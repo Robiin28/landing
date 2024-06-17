@@ -19,7 +19,7 @@ function Nav() {
       <button onClick={displayModal}>Show Modal</button>
       <Modal showModal={showModal} hideModal={hideModal} />
     </>,
-    document.getElementById('footer') // Ensure this element exists in your HTML
+    document.getElementById('footer')
   );
 }
 

@@ -4,6 +4,8 @@ import Home from './components/Home';
 import FilterProduct from './components/filterProduct/FilterProduct';
 import ProductList from './components/movie/ProductList';
 import CreateProduct from './components/createProduct/CreateProduct';
+import Login from './components/login/Login';
+import SignUp from'./components/signUp/sign-up'
 
  const movie = [
      {
@@ -83,8 +85,14 @@ import CreateProduct from './components/createProduct/CreateProduct';
     }
 ];
 function App() {
-   
-    
+
+    const[isLoggedIn,updateIsLoggedIn]=useState(false);
+    const loginHandler=(email,password)=>{
+    updateIsLoggedIn(true);
+    }
+    const logoutHandler=()=>{
+        updateIsLoggedIn(false);
+    }
     let [newMovie, updateMovie] = useState(movie);
     let [filterTextValue, updateFilter] = useState('all');
     let filterMovie = newMovie.filter((movies) => {
@@ -109,11 +117,23 @@ function App() {
 
     return (
     <>
-      <Nav />
-          <Home />
-            <CreateProduct createProduct={addProduct} />
-            <FilterProduct filterValue={ filter} />
-           <ProductList newMovie={filterMovie} />
+                        
+                           <Nav />
+                            <Home />
+                            <CreateProduct createProduct={addProduct} />
+                            <FilterProduct filterValue={ filter} />
+                           <ProductList newMovie={filterMovie} /> 
+                        
+           {/* <MainHeader isAuthenticated={isLoggedIn} onLogout={logoutHandler}/>
+           <main>
+                {!isLoggedIn ? (
+                    <Login onLogin={loginHandler} />
+                ) : (
+                    <Home onLogout={logoutHandler} />
+                )}
+           </main>                    */}
+           {/* <Login></Login> */}
+           {/* <SignUp/> */}
     </>
   );
 }

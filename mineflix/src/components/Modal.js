@@ -46,10 +46,8 @@ const Modal = (props) => {
         style={overlayStyle} 
         onClick={props.hideModal}
       >
-
       </div>
     </>
   );
 };
-
 export default Modal;
