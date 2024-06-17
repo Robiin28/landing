@@ -5,7 +5,8 @@ import FilterProduct from './components/filterProduct/FilterProduct';
 import ProductList from './components/movie/ProductList';
 import CreateProduct from './components/createProduct/CreateProduct';
 import Login from './components/login/Login';
-import SignUp from'./components/signUp/sign-up'
+import SignUp from'./components/signUp/sign-up';
+import Form from './components/Form';
 
  const movie = [
      {
@@ -117,12 +118,12 @@ function App() {
 
     return (
     <>
-                        
+{/*                         
                            <Nav />
                             <Home />
                             <CreateProduct createProduct={addProduct} />
                             <FilterProduct filterValue={ filter} />
-                           <ProductList newMovie={filterMovie} /> 
+                           <ProductList newMovie={filterMovie} />  */}
                         
            {/* <MainHeader isAuthenticated={isLoggedIn} onLogout={logoutHandler}/>
            <main>
@@ -134,6 +135,8 @@ function App() {
            </main>                    */}
            {/* <Login></Login> */}
            {/* <SignUp/> */}
+
+           <Form />
     </>
   );
 }
