@@ -47,7 +47,7 @@ a {
 button {
 	border-radius: 20px;
 	border: 1px solid #FF4B2B;
-	background-color: #FF4B2B;
+	background-color: #290701;
 	color: #FFFFFF;
 	font-size: 12px;
 	font-weight: bold;
@@ -97,6 +97,7 @@ input {
 	position: relative;
 	overflow: hidden;
 	width: 768px;
+	height:500px;
 	max-width: 100%;
 	min-height: 480px;
 }
@@ -160,9 +161,9 @@ input {
 }
 
 .overlay {
-	background: #FF416C;
-	background: -webkit-linear-gradient(to right, #FF4B2B, #FF416C);
-	background: linear-gradient(to right, #FF4B2B, #FF416C);
+	background: #160300;
+	background: -webkit-linear-gradient(to right, #2c0700, #4b0a07);
+	background: linear-gradient(to right, #4b0a07, #2c0700);
 	background-repeat: no-repeat;
 	background-size: cover;
 	background-position: 0 0;
@@ -230,9 +231,9 @@ input {
 /* /// */
 .form__group {
     position: relative;
-    padding: 20px 0 0;
+    padding: 21px 0 0;
     width: 100%;
-    max-width: 180px;
+    max-width: 240px;
   }
   
   .form__field {
@@ -243,7 +244,7 @@ input {
     outline: 0;
     font-size: 17px;
     color: #fff;
-    padding: 7px 0;
+    padding: 8px 0;
     background: transparent;
     transition: border-color 0.2s;
   }
@@ -264,15 +265,15 @@ input {
     display: block;
     transition: 0.2s;
     font-size: 17px;
-    color: #9b9b9b;
-    pointer-events: none;
+    color: #180000;
+    pointer-events:painted;
   }
   
   .form__field:focus {
     padding-bottom: 6px;
     font-weight: 700;
     border-width: 3px;
-    border-image: linear-gradient(to right, #116399, #38caef);
+    border-image: linear-gradient(to right, #2e0202, #690101);
     border-image-slice: 1;
   }
   
@@ -282,7 +283,7 @@ input {
     display: block;
     transition: 0.2s;
     font-size: 17px;
-    color: #38caef;
+    color: #300202;
     font-weight: 700;
   }
   
@@ -290,5 +291,30 @@ input {
   .form__field:required, .form__field:invalid {
     box-shadow: none;
   }
-
+  .btn {
+	margin-top:30px;
+	font-size: 1rem;
+	padding: 0.5rem 1.5rem;
+	border: none;
+	outline: none;
+	border-radius: 1rem;
+	cursor: pointer;
+	text-transform: uppercase;
+	background-color: white;
+	color: #160300;
+	font-weight: 600;
+	transition: 0.6s;
+	box-shadow: 10px 10px 60px #160300;
+	-webkit-box-reflect: below 10px linear-gradient(to bottom, rgba(0,0,0,0.0), rgba(0,0,0,0.4));
+  }
+  
+  .btn:active {
+	scale: 0.92;
+  }
+  
+  .btn:hover {
+	background: rgb(196, 213, 245);
+	background: linear-gradient(270deg, #160300 0%, rgba(214, 156, 148, 0.873) 60%);
+	color: rgb(230, 230, 235);
+  }
 
