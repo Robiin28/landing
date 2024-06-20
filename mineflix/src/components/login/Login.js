@@ -1,46 +1,52 @@
-import React, { useState, useEffect } from 'react';
-import './login.css'; // Import the CSS file for this component
-import passwordValidator from 'password-validator';
+import React, { useState, useReducer, useEffect } from 'react';
+import './login.css';
 
+// Reducer functions to handle input state and validation
+function emailReducer(state, action) {
+    switch (action.type) {
+        case 'EMAIL_INPUT':
+            return { value: action.val, isValid: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(action.val) };
+        default:
+            return state;
+    }
+}
+
+function passwordReducer(state, action) {
+    switch (action.type) {
+        case 'PASS_INPUT':
+            return { value: action.val, isValid: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/.test(action.val) };
+        default:
+            return state;
+    }
+}
 
 const Login = (props) => {
-    const [enteredEmail, setEnteredEmail] = useState('');
-    const [enteredPassword, setEnteredPassword] = useState('');
-    const [emailIsValid, setEmailIsValid] = useState(true);
-    const [passwordIsValid, setPasswordIsValid] = useState(true);
+    const [emailState, emailDispatcher] = useReducer(emailReducer, { value: '', isValid: false });
+    const [passState, passwordDispatcher] = useReducer(passwordReducer, { value: '', isValid: false });
     const [formIsValid, setFormIsValid] = useState(false);
 
-    // Use useEffect to set form validity based on email and password
     useEffect(() => {
-        const isEmailValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(enteredEmail);
-        const isPasswordValid = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/.test(enteredPassword);
-        setFormIsValid(isEmailValid && isPasswordValid);
-    }, [enteredEmail, enteredPassword]);
+        // Update form validity whenever email or password validity changes
+        setFormIsValid(emailState.isValid && passState.isValid);
+    }, [emailState.isValid, passState.isValid]);
 
     const emailChangeHandler = (event) => {
-        setEnteredEmail(event.target.value);
+        const value = event.target.value;
+        emailDispatcher({ val: value, type: 'EMAIL_INPUT' });
     };
 
     const passwordChangeHandler = (event) => {
-        setEnteredPassword(event.target.value);
+        const value = event.target.value;
+        passwordDispatcher({ val: value, type: 'PASS_INPUT' });
     };
 
-    const emailBlurHandler = () => {
-        setEmailIsValid(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(enteredEmail));
-    };
-
-    const passwordBlurHandler = () => {
-        setPasswordIsValid(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/.test(enteredPassword));
-    };
-
-    const submitHandler = (event) => {
+    const handleSubmit = (event) => {
         event.preventDefault();
-        if (formIsValid) {
-            props.onLogin(enteredEmail, enteredPassword);
-        } else {
-            // Additional validation to handle the case where the user submits without focusing out
-            setEmailIsValid(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(enteredEmail));
-            setPasswordIsValid(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/.test(enteredPassword));
+        emailDispatcher({ type: 'EMAIL_INPUT', val: emailState.value }); // Trigger email validation
+        passwordDispatcher({ type: 'PASS_INPUT', val: passState.value }); // Trigger password validation
+
+        if (emailState.isValid && passState.isValid) {
+            props.onLogin(emailState.value, passState.value);
         }
     };
 
@@ -48,42 +54,32 @@ const Login = (props) => {
         <div className="login-container">
             <h2>Login</h2>
             <p>Enter your credentials</p>
-            <form className="login-form" onSubmit={submitHandler}>
-                <div className={`form-control ${!emailIsValid ? 'invalid' : ''}`}>
+            <form className="login-form" onSubmit={handleSubmit}>
+                <div className={`form-control ${emailState.isValid === false && emailState.value !== '' ? 'invalid' : ''}`}>
                     <label htmlFor="email">Email</label>
                     <input
                         id="email"
                         type="email"
-                        pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-                        title="Enter a valid email address (e.g., someone@example.com)"
                         placeholder="Enter your email"
                         onChange={emailChangeHandler}
-                        onBlur={emailBlurHandler}
-                        value={enteredEmail}
+                        value={emailState.value}
+                        onBlur={() => emailDispatcher({ type: 'EMAIL_INPUT', val: emailState.value })}
+                        required
                     />
                 </div>
-                <div className={`form-control ${!passwordIsValid ? 'invalid' : ''}`}>
+                <div className={`form-control ${passState.isValid === false && passState.value !== '' ? 'invalid' : ''}`}>
                     <label htmlFor="password">Password</label>
                     <input
                         id="password"
                         type="password"
                         placeholder="Enter your password"
-                        required
-                        pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$"
-                        title="Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one digit."
                         onChange={passwordChangeHandler}
-                        onBlur={passwordBlurHandler}
-                        value={enteredPassword}
+                        value={passState.value}
+                        onBlur={() => passwordDispatcher({ type: 'PASS_INPUT', val: passState.value })}
+                        required
                     />
                 </div>
-               
-             
-
-                <button
-                    className={'btn'}
-                    type="submit"
-                    disabled={!formIsValid}
-                >
+                <button className={'btn'} type="submit" disabled={!formIsValid}>
                     Login
                 </button>
             </form>
@@ -92,4 +88,3 @@ const Login = (props) => {
 };
 
 export default Login;
-

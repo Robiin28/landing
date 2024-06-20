@@ -1,7 +1,7 @@
 
-@import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
+/* @import url('https://fonts.googleapis.com/css?family=Montserrat:400,800'); */
 
-* {
+/* * {
 	box-sizing: border-box;
 }
 
@@ -310,11 +310,11 @@ input {
   
   .btn:active {
 	scale: 0.92;
-  }
+  } */
   
-  .btn:hover {
+  /* .btn:hover {
 	background: rgb(196, 213, 245);
 	background: linear-gradient(270deg, #160300 0%, rgba(214, 156, 148, 0.873) 60%);
 	color: rgb(230, 230, 235);
-  }
+  } */
 

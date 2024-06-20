@@ -133,10 +133,10 @@ function App() {
                     <Home onLogout={logoutHandler} />
                 )}
            </main>                    */}
-           {/* <Login></Login> */}
+           <Login></Login>
            {/* <SignUp/> */}
 
-           <Form />
+           {/* <Form /> */}
     </>
   );
 }
