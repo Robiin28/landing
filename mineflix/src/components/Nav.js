@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Modal from "./Modal"; // Ensure this component is properly defined
 import ReactDOM from "react-dom";
+import './nav.css'
 
 function Nav() {
   const [showModal, setShowModal] = useState(false);
@@ -15,8 +16,7 @@ function Nav() {
 
   return ReactDOM.createPortal(
     <>
-      <h1>Nav</h1>
-      <button onClick={displayModal}>Show Modal</button>
+      <button onClick={displayModal}  className={"modal"}>Show Modal</button>
       <Modal showModal={showModal} hideModal={hideModal} />
     </>,
     document.getElementById('footer')

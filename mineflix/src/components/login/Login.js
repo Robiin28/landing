@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState,useContext } from 'react';
 import './login.css';
+import AuthContext from '../context/AuthContext';
 
 const Login = (props) => {
+
+let auter=useContext(AuthContext);
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [emailValid, setEmailValid] = useState(false);
@@ -10,7 +14,7 @@ const Login = (props) => {
 
     const handleEmailChange = (event) => {
         const value = event.target.value;
-        setEmail(value);
+        setEmail(value); 
         setEmailValid(validateEmail(value));
     };
 

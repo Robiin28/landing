@@ -1,20 +1,12 @@
-const MainHeader=(props)=>{
+import React from 'react';
+import Nav from './Navigation';
 
-return 
-<>
+const MainHeader = () => {
+    return (
+        <header>
+            <Nav />
+        </header>
+    );
+};
 
-<span>User</span>
-<span>Admin</span>
-<span>Login</span>
-
-<main>
-                {!props.isAuthenticated ? (
-                    <Login onLogin={loginHandler} />
-                ) : (
-                    <Home onLogout={logoutHandler} />
-                )}
-           </main> 
-</>n
-
-}
 export default MainHeader;

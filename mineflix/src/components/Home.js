@@ -1,9 +1,12 @@
+import Navigation from "./Navigation";
 
 
 function Home() {
   return (
     <>
-   <h1>Home</h1>
+   
+   {/* <Navigation/>
+   <h1>Home</h1> */}
     </>
   );
 }
