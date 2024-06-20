@@ -1,53 +1,61 @@
-import React, { useState, useReducer, useEffect } from 'react';
+import React, { useState } from 'react';
 import './login.css';
 
-// Reducer functions to handle input state and validation
-function emailReducer(state, action) {
-    switch (action.type) {
-        case 'EMAIL_INPUT':
-            return { value: action.val, isValid: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(action.val) };
-        default:
-            return state;
-    }
-}
-
-function passwordReducer(state, action) {
-    switch (action.type) {
-        case 'PASS_INPUT':
-            return { value: action.val, isValid: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/.test(action.val) };
-        default:
-            return state;
-    }
-}
-
 const Login = (props) => {
-    const [emailState, emailDispatcher] = useReducer(emailReducer, { value: '', isValid: false });
-    const [passState, passwordDispatcher] = useReducer(passwordReducer, { value: '', isValid: false });
-    const [formIsValid, setFormIsValid] = useState(false);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [emailValid, setEmailValid] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showChangeEmail, setShowChangeEmail] = useState(false); // New state for showing "Change Email" link
 
-    useEffect(() => {
-        // Update form validity whenever email or password validity changes
-        setFormIsValid(emailState.isValid && passState.isValid);
-    }, [emailState.isValid, passState.isValid]);
-
-    const emailChangeHandler = (event) => {
+    const handleEmailChange = (event) => {
         const value = event.target.value;
-        emailDispatcher({ val: value, type: 'EMAIL_INPUT' });
+        setEmail(value);
+        setEmailValid(validateEmail(value));
     };
 
-    const passwordChangeHandler = (event) => {
+    const handlePasswordChange = (event) => {
         const value = event.target.value;
-        passwordDispatcher({ val: value, type: 'PASS_INPUT' });
+        setPassword(value);
+    };
+
+    const validateEmail = (email) => {
+        // Basic email validation using regex
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    };
+
+    const validatePassword = (password) => {
+        // Password validation using regex
+        // Password must contain at least one uppercase letter, one lowercase letter, one digit, and be at least 8 characters long
+        return /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/.test(password);
+    };
+
+    const handleNextClick = () => {
+        if (validateEmail(email)) {
+            setEmailValid(true); // Set emailValid to true if email is valid
+            setShowPassword(true); // Show password input
+            setShowChangeEmail(true); // Show "Change Email" link
+        } else {
+            setEmailValid(false); // Set emailValid to false if email is not valid
+            setShowPassword(false); // Hide password input
+            setShowChangeEmail(false); // Hide "Change Email" link
+        }
+    };
+
+    const handleResetEmail = () => {
+        setShowPassword(false); // Hide password input
+        setShowChangeEmail(false); // Hide "Change Email" link again
     };
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        emailDispatcher({ type: 'EMAIL_INPUT', val: emailState.value }); // Trigger email validation
-        passwordDispatcher({ type: 'PASS_INPUT', val: passState.value }); // Trigger password validation
-
-        if (emailState.isValid && passState.isValid) {
-            props.onLogin(emailState.value, passState.value);
+        // Validate email and password
+        if (!validateEmail(email) || !validatePassword(password)) {
+            alert('Please enter a valid email and password.');
+            return;
         }
+        // Proceed with login logic
+        props.onLogin(email, password);
     };
 
     return (
@@ -55,33 +63,52 @@ const Login = (props) => {
             <h2>Login</h2>
             <p>Enter your credentials</p>
             <form className="login-form" onSubmit={handleSubmit}>
-                <div className={`form-control ${emailState.isValid === false && emailState.value !== '' ? 'invalid' : ''}`}>
+                <div className="form-control">
                     <label htmlFor="email">Email</label>
-                    <input
-                        id="email"
-                        type="email"
-                        placeholder="Enter your email"
-                        onChange={emailChangeHandler}
-                        value={emailState.value}
-                        onBlur={() => emailDispatcher({ type: 'EMAIL_INPUT', val: emailState.value })}
-                        required
-                    />
+                    <div className="email-input">
+                        <input
+                            id="email"
+                            type="email"
+                            placeholder="Enter your email"
+                            value={email}
+                            onChange={handleEmailChange}
+                            disabled={showPassword} // Disable email input when password is shown
+                            required
+                        />
+                        {showChangeEmail && (
+                            <span className="change-email-text" onClick={handleResetEmail}>
+                                Change Email
+                            </span>
+                        )}
+                    </div>
                 </div>
-                <div className={`form-control ${passState.isValid === false && passState.value !== '' ? 'invalid' : ''}`}>
-                    <label htmlFor="password">Password</label>
-                    <input
-                        id="password"
-                        type="password"
-                        placeholder="Enter your password"
-                        onChange={passwordChangeHandler}
-                        value={passState.value}
-                        onBlur={() => passwordDispatcher({ type: 'PASS_INPUT', val: passState.value })}
-                        required
-                    />
+                {showPassword && (
+                    <div className="form-control">
+                        <label htmlFor="password">Password</label>
+                        <div className="password-input">
+                            <input
+                                id="password"
+                                type="password"
+                                placeholder="Enter your password"
+                                value={password}
+                                onChange={handlePasswordChange} // Update password state on change
+                                required
+                            />
+                        </div>
+                    </div>
+                )}
+                <div className="form-actions">
+                    {!showPassword && (
+                        <button type="button" className="btn" onClick={handleNextClick} disabled={!validateEmail(email)}>
+                            Next
+                        </button>
+                    )}
+                    {showPassword && (
+                        <button type="submit" className="btn" disabled={!validatePassword(password)}>
+                            Login
+                        </button>
+                    )}
                 </div>
-                <button className={'btn'} type="submit" disabled={!formIsValid}>
-                    Login
-                </button>
             </form>
         </div>
     );

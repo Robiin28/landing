@@ -1,5 +1,3 @@
-/* login.css */
-
 .login-container {
     display: flex;
     flex-direction: column;
@@ -67,6 +65,40 @@
 .form-control.invalid input {
     border-color: red;
 }
+
+/* Style for disabled email input */
+.login-form input[disabled] {
+    background-color: #eee; /* Gray background when disabled */
+    color: #999; /* Lighter text color when disabled */
+    cursor: not-allowed; /* Cursor style when disabled */
+}
+
+.login-form .email-input {
+    position: relative;
+    width: 100%;
+}
+
+.login-form .change-email-text {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 24px;
+    color: #007BFF;
+    cursor: pointer;
+}
+
+.login-form .change-email-text:hover {
+    text-decoration: none;
+    color:green;
+    font: bolder;
+}
+
+.login-form .form-actions {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
 .login-form button {
     width: 80%;
     padding: 10px;
