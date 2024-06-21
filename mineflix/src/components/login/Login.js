@@ -1,65 +1,86 @@
-import React, { useState,useContext } from 'react';
+import React, { useState, useContext, useRef } from 'react';
 import './login.css';
-import AuthContext,{AuterContextProvider} from '../context/AuthContext';
+import AuthContext from '../context/AuthContext';
+import Input from '../input/Input';
 
 const Login = () => {
+    const authContext = useContext(AuthContext);
 
-    let auter=useContext(AuthContext);
+    const emailRef = useRef(null);
+    const passRef = useRef(null);
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [emailValid, setEmailValid] = useState(false);
+    const [emailValid, setEmailValid] = useState(true);
+    const [passwordValid, setPasswordValid] = useState(true); // State to track password validity
     const [showPassword, setShowPassword] = useState(false);
-    const [showChangeEmail, setShowChangeEmail] = useState(false); // New state for showing "Change Email" link
+    const [showChangeEmail, setShowChangeEmail] = useState(false);
 
     const handleEmailChange = (event) => {
         const value = event.target.value;
-        setEmail(value); 
-        setEmailValid(validateEmail(value));
+        setEmail(value);
+        setEmailValid(true); // Reset validity state when typing
     };
 
     const handlePasswordChange = (event) => {
         const value = event.target.value;
         setPassword(value);
+        setPasswordValid(true); // Reset validity state when typing
+    };
+
+    const handleEmailBlur = () => {
+        if (!validateEmail(email)) {
+            setEmailValid(false);
+        }
+    };
+
+    const handlePasswordBlur = () => {
+        if (!validatePassword(password)) {
+            setPasswordValid(false);
+        }
     };
 
     const validateEmail = (email) => {
-        // Basic email validation using regex
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     };
 
     const validatePassword = (password) => {
-        // Password validation using regex
-        // Password must contain at least one uppercase letter, one lowercase letter, one digit, and be at least 8 characters long
         return /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/.test(password);
     };
 
     const handleNextClick = () => {
         if (validateEmail(email)) {
-            setEmailValid(true); // Set emailValid to true if email is valid
-            setShowPassword(true); // Show password input
-            setShowChangeEmail(true); // Show "Change Email" link
+            setEmailValid(true);
+            setShowPassword(true);
+            setShowChangeEmail(true);
+            if (passRef.current) {
+                passRef.current.focus();
+            }
         } else {
-            setEmailValid(false); // Set emailValid to false if email is not valid
-            setShowPassword(false); // Hide password input
-            setShowChangeEmail(false); // Hide "Change Email" link
+            setEmailValid(false);
+            setShowPassword(false);
+            setShowChangeEmail(false);
+            if (emailRef.current) {
+                emailRef.current.focus();
+            }
         }
     };
 
     const handleResetEmail = () => {
-        setShowPassword(false); // Hide password input
-        setShowChangeEmail(false); // Hide "Change Email" link again
+        setShowPassword(false);
+        setShowChangeEmail(false);
+        if (emailRef.current) {
+            emailRef.current.focus();
+        }
     };
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        // Validate email and password
         if (!validateEmail(email) || !validatePassword(password)) {
             alert('Please enter a valid email and password.');
             return;
         }
-        // Proceed with login logic
-       auter.onLogin(email, password);
+        authContext.onLogin(email, password);
     };
 
     return (
@@ -67,48 +88,41 @@ const Login = () => {
             <h2>Login</h2>
             <p>Enter your credentials</p>
             <form className="login-form" onSubmit={handleSubmit}>
-                <div className="form-control">
-                    <label htmlFor="email">Email</label>
-                    <div className="email-input">
-                        <input
-                            id="email"
-                            type="email"
-                            placeholder="Enter your email"
-                            value={email}
-                            onChange={handleEmailChange}
-                            disabled={showPassword} // Disable email input when password is shown
-                            required
-                        />
-                        {showChangeEmail && (
-                            <span className="change-email-text" onClick={handleResetEmail}>
-                                Change Email
-                            </span>
-                        )}
-                    </div>
-                </div>
+                <Input
+                    ref={emailRef}
+                    name="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChangeHandler={handleEmailChange}
+                    onBlurHandler={handleEmailBlur} // Handle blur event for email
+                    showChangeLink={showChangeEmail}
+                    onReset={handleResetEmail}
+                    label="Email"
+                    disabled={showPassword}
+                    isValid={emailValid} // Pass validity state for styling
+                />
                 {showPassword && (
-                    <div className="form-control">
-                        <label htmlFor="password">Password</label>
-                        <div className="password-input">
-                            <input
-                                id="password"
-                                type="password"
-                                placeholder="Enter your password"
-                                value={password}
-                                onChange={handlePasswordChange} // Update password state on change
-                                required
-                            />
-                        </div>
-                    </div>
+                    <Input
+                        ref={passRef}
+                        name="password"
+                        type="password"
+                        placeholder="Enter your password"
+                        value={password}
+                        onChangeHandler={handlePasswordChange}
+                        onBlurHandler={handlePasswordBlur} // Handle blur event for password
+                        label="Password"
+                        isValid={passwordValid} // Pass validity state for styling
+                    />
                 )}
                 <div className="form-actions">
                     {!showPassword && (
-                        <button type="button" className="btn" onClick={handleNextClick} disabled={!validateEmail(email)}>
+                        <button type="button" className="btn" onClick={handleNextClick}>
                             Next
                         </button>
                     )}
                     {showPassword && (
-                        <button type="submit" className="btn" disabled={!validatePassword(password)}>
+                        <button type="submit" className="btn">
                             Login
                         </button>
                     )}
