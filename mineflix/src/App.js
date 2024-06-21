@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useContext } from 'react';
 import AuthContext from './components/context/AuthContext';
 import Nav from './components/Nav';
 import Home from './components/Home';
@@ -89,27 +89,11 @@ const movie = [
 ];
 
 function App() {
-    const [isLoggedIn, updateIsLoggedIn] = useState(false);
-
     // Check if user was logged in from localStorage on initial load
-    useEffect(() => {
-        const storedIsLoggedIn = localStorage.getItem('isLoggedIn');
-        if (storedIsLoggedIn === 'true') {
-            updateIsLoggedIn(true);
-        }
-    }, []);
 
-    const loginHandler = (email, password) => {
-        updateIsLoggedIn(true);
-        localStorage.setItem('isLoggedIn', 'true');
-    };
 
-    const logoutHandler = () => {
-        console.log("Logging out"); // Debug log
-        updateIsLoggedIn(false);
-        localStorage.setItem('isLoggedIn', 'false');
-    };
 
+    let auter=useContext(AuthContext);
     let [newMovie, updateMovie] = useState(movie);
     let [filterTextValue, updateFilter] = useState('all');
     let filterMovie = newMovie.filter((movies) => {
@@ -132,11 +116,11 @@ function App() {
     };
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, onLogout: logoutHandler }}>
-            <MainHeader onLogout={logoutHandler} />
+        <>
+            <MainHeader/>
          <main>
-  {!isLoggedIn && <Login onLogin={loginHandler} />}
-  {isLoggedIn && (
+  {!auter.isLoggedIn && <Login/>}
+  {auter.isLoggedIn && (
     <div>
       <Nav />
       <Home />
@@ -146,7 +130,7 @@ function App() {
     </div>
   )}
 </main>
-        </AuthContext.Provider>
+        </>
     );
 }
 export default App;

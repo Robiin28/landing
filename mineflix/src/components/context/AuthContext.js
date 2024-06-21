@@ -1,15 +1,12 @@
-import React,{useState,useEffect} from 'react';
-
-let AuthContext = React.createContext({
+import React, { useState, useEffect } from 'react';
+const AuthContext = React.createContext({
     isLoggedIn: false,
-    onLogout: undefined,
-    onLogin:undefined
+    onLogout: () => {},
+    onLogin: (email, password) => {}
 });
-export function AutoContextprovider(props){
-   
+export function AuthContextProvider(props) {
     const [isLoggedIn, updateIsLoggedIn] = useState(false);
-      // Check if user was logged in from localStorage on initial load
-      useEffect(() => {
+    useEffect(() => {
         const storedIsLoggedIn = localStorage.getItem('isLoggedIn');
         if (storedIsLoggedIn === 'true') {
             updateIsLoggedIn(true);
@@ -17,6 +14,7 @@ export function AutoContextprovider(props){
     }, []);
 
     const loginHandler = (email, password) => {
+        console.log(`Logging in with email: ${email}`);
         updateIsLoggedIn(true);
         localStorage.setItem('isLoggedIn', 'true');
     };
@@ -26,8 +24,11 @@ export function AutoContextprovider(props){
         localStorage.setItem('isLoggedIn', 'false');
     };
 
-    return<AuthContext.Provider value={{isLoggedIn:isLoggedIn,onLogout:logoutHandler,onLogin:loginHandler}}>
-        {props.children}
-    </AuthContext.Provider>
+    return (
+        <AuthContext.Provider value={{ isLoggedIn:isLoggedIn, onLogout: logoutHandler, onLogin: loginHandler }}>
+            {props.children}
+        </AuthContext.Provider>
+    );
 }
+
 export default AuthContext;

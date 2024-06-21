@@ -1,10 +1,10 @@
 import React, { useState,useContext } from 'react';
 import './login.css';
-import AuthContext from '../context/AuthContext';
+import AuthContext,{AuterContextProvider} from '../context/AuthContext';
 
-const Login = (props) => {
+const Login = () => {
 
-let auter=useContext(AuthContext);
+    let auter=useContext(AuthContext);
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -59,7 +59,7 @@ let auter=useContext(AuthContext);
             return;
         }
         // Proceed with login logic
-        props.onLogin(email, password);
+       auter.onLogin(email, password);
     };
 
     return (
