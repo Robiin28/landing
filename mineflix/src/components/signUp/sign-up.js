@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '../login/login.css'; // Import the CSS file for this component
 import passwordValidator from 'password-validator';
 import './passwordStrengthMeter.css'; // Import CSS for PasswordStrengthMeter
@@ -16,6 +16,10 @@ schema
   .has().not().spaces(); // Should not have spaces
 
 const SignUp = (props) => {
+    let nameRef = useRef();
+    let emailRef = useRef();
+    let passRef = useRef();
+
     const [enteredName, setEnteredName] = useState('');
     const [enteredEmail, setEnteredEmail] = useState('');
     const [enteredPassword, setEnteredPassword] = useState('');
@@ -26,39 +30,28 @@ const SignUp = (props) => {
     const [confirmedPasswordIsValid, setConfirmedPasswordIsValid] = useState(true);
     const [formIsValid, setFormIsValid] = useState(false);
 
-    // Use useEffect to set form validity based on name, email, password, and confirmed password
     useEffect(() => {
-        const isNameValid = /^[A-Z]+[a-z0-9]{6,}$/.test(enteredName);
-        const isEmailValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(enteredEmail);
-        const isPasswordValid = schema.validate(enteredPassword);  // Validate password using schema
+        const isNameValid = /^[A-Za-z][A-Za-z0-9]{6,}$/.test(enteredName);
+        const isEmailValid = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(enteredEmail);
+        const isPasswordValid = schema.validate(enteredPassword);
         const isConfirmedPasswordValid = enteredPassword === confirmedPassword;
-        setFormIsValid(
-            isNameValid && 
-            isEmailValid && 
-            isPasswordValid && 
-            isConfirmedPasswordValid
-        );
-    }, [
-        enteredName,
-        enteredEmail,
-        enteredPassword,
-        confirmedPassword
-    ]);
+        setFormIsValid(isNameValid && isEmailValid && isPasswordValid && isConfirmedPasswordValid);
+    }, [enteredName, enteredEmail, enteredPassword, confirmedPassword]);
 
     const handleChange = (setter) => (event) => {
         setter(event.target.value);
     };
 
     const handleNameBlur = () => {
-        setNameIsValid(/^[A-Z]+[a-z0-9]{6,}$/.test(enteredName));
+        setNameIsValid(/^[A-Za-z][A-Za-z0-9]{6,}$/.test(enteredName));
     };
 
     const handleEmailBlur = () => {
-        setEmailIsValid(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(enteredEmail));
+        setEmailIsValid(/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(enteredEmail));
     };
 
     const handlePasswordBlur = () => {
-        setPasswordIsValid(schema.validate(enteredPassword));  // Validate password onBlur
+        setPasswordIsValid(schema.validate(enteredPassword));
     };
 
     const handleConfirmedPasswordBlur = () => {
@@ -67,30 +60,31 @@ const SignUp = (props) => {
 
     const handlePasswordChange = (event) => {
         setEnteredPassword(event.target.value);
-        // Check if the confirmed password matches immediately after changing the password
         setConfirmedPasswordIsValid(event.target.value === confirmedPassword);
     };
 
     const handleConfirmedPasswordChange = (event) => {
         setConfirmedPassword(event.target.value);
-        // Update the validity of confirmed password immediately after changing it
         setConfirmedPasswordIsValid(enteredPassword === event.target.value);
     };
 
     const submitHandler = (event) => {
         event.preventDefault();
-        if (formIsValid) {
-            props.onLogin(enteredEmail, enteredPassword, enteredName);
-        } else {
-            // Additional validation to handle the case where the user submits without focusing out
-            setNameIsValid(/^[A-Z]+[a-z0-9]{6,}$/.test(enteredName));
-            setEmailIsValid(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(enteredEmail));
-            setPasswordIsValid(schema.validate(enteredPassword));
-            setConfirmedPasswordIsValid(enteredPassword === confirmedPassword);
-        }
+            let user = {
+                name: nameRef.current.value,
+                email: emailRef.current.value,
+                password: passRef.current.value
+            };
+            console.log(user);
+            // props.onLogin(enteredEmail, enteredPassword, enteredName)
+       
+            // setNameIsValid(/^[A-Za-z][A-Za-z0-9]{6,}$/.test(enteredName));
+            // setEmailIsValid(/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(enteredEmail));
+            // setPasswordIsValid(schema.validate(enteredPassword));
+            // setConfirmedPasswordIsValid(enteredPassword === confirmedPassword);
+        
     };
 
-    // Function to calculate the password strength score and return a percentage
     const calculatePasswordStrength = (password) => {
         let strength = 0;
 
@@ -98,13 +92,12 @@ const SignUp = (props) => {
         if (password.match(/[A-Z]/)) strength += 25;
         if (password.match(/[a-z]/)) strength += 25;
         if (password.match(/[0-9]/)) strength += 25;
-        if (password.match(/[\W_]/)) strength += 25; // Add for symbols
-        if (strength > 100) strength = 100; // Max out at 100%
+        if (password.match(/[\W_]/)) strength += 25;
+        if (strength > 100) strength = 100;
 
         return strength;
     };
 
-    // Function to get color based on the password strength score
     const getPasswordStrengthColor = (strength) => {
         if (strength >= 75) return 'green';
         if (strength >= 50) return 'orange';
@@ -112,7 +105,6 @@ const SignUp = (props) => {
         return 'red';
     };
 
-    // Calculate the current password strength
     const passwordStrength = calculatePasswordStrength(enteredPassword);
     const passwordStrengthColor = getPasswordStrengthColor(passwordStrength);
 
@@ -126,7 +118,8 @@ const SignUp = (props) => {
                     <input
                         id="name"
                         type="text"
-                        pattern="^[A-Z]+[a-z0-9]{6,}$"
+                        ref={nameRef}
+                        pattern="^[A-Za-z][A-Za-z0-9]{6,}$"
                         title="Enter a valid name (e.g., JohnDoe123)"
                         placeholder="Enter your name"
                         onChange={handleChange(setEnteredName)}
@@ -140,19 +133,22 @@ const SignUp = (props) => {
                     <input
                         id="email"
                         type="email"
-                        pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                        ref={emailRef}
+                        pattern="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
                         title="Enter a valid email address (e.g., someone@example.com)"
                         placeholder="Enter your email"
                         onChange={handleChange(setEnteredEmail)}
                         onBlur={handleEmailBlur}
                         value={enteredEmail}
                     />
+                    {!emailIsValid && <p className="error-text">Please enter a valid email address.</p>}
                 </div>
                 <div className={`form-control ${!passwordIsValid ? 'invalid' : ''}`}>
                     <label htmlFor="password">Password</label>
                     <input
                         id="password"
                         type="password"
+                        ref={passRef}
                         placeholder="Enter your password"
                         onChange={handlePasswordChange}
                         onBlur={handlePasswordBlur}
@@ -169,6 +165,7 @@ const SignUp = (props) => {
                             {passwordStrength}% Strength
                         </span>
                     </div>
+                    {!passwordIsValid && <p className="error-text">Password must meet the requirements.</p>}
                 </div>
                 <div className={`form-control ${!confirmedPasswordIsValid ? 'invalid' : ''}`}>
                     <label htmlFor="confirmPassword">Confirm Password</label>
@@ -180,6 +177,7 @@ const SignUp = (props) => {
                         onBlur={handleConfirmedPasswordBlur}
                         value={confirmedPassword}
                     />
+                    {!confirmedPasswordIsValid && <p className="error-text">Passwords do not match.</p>}
                 </div>
                 <button
                     className={'btn'}

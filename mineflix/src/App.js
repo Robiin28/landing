@@ -117,7 +117,7 @@ function App() {
 
     return (
         <>
-            <MainHeader/>
+            {/* <MainHeader/>
          <main>
   {!auter.isLoggedIn && <Login/>}
   {auter.isLoggedIn && (
@@ -129,7 +129,8 @@ function App() {
       <ProductList newMovie={filterMovie} />
     </div>
   )}
-</main>
+</main> */}
+<SignUp></SignUp>
         </>
     );
 }
