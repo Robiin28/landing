@@ -1,7 +1,15 @@
 
 const mongoose= require('mongoose');
+const cors=require('cors');
 const dotenv = require('dotenv');
 dotenv.config({ path: './config.env' });
+const express = require('express');
+const app = require('./apps');
+app.use(cors({
+    origin:"http://localhost:3000"
+}));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 process.on('uncaughtException', (err) => {
     // console.log(err);
@@ -10,7 +18,6 @@ process.on('uncaughtException', (err) => {
     process.exit(1);
 })
 
-const app = require('./apps');
 
 
 
@@ -24,7 +31,8 @@ mongoose.connect(process.env.CONN_STR, {
     // console.log("some error happen");
     // }
     // )
-const port = process.env.PORT || 3000;
+
+const port = process.env.PORT || 5000;
 const server= app.listen(port, () => {
 console.log('server is starting')
 });

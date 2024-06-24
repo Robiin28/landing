@@ -45,6 +45,8 @@ exports.signup = asyncErrorHandler(async (req, res, next) => {
     //     data: {
     //         user:newUser
     //     }
+
+    
     // });
 });
 exports.login=asyncErrorHandler(async (req, res, next)=>{
