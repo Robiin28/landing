@@ -48,12 +48,15 @@ const userSchema = new mongoose.Schema({
     },
     active: {
         type: Boolean,
-        default: true,
+        default: false,
         selected: false
 
     },
       passwordResetToken: String,
-      passwordResetTokenExpire: Date
+      encryptedValidationNumber:String,
+      
+      passwordResetTokenExpire: Date,
+      validationNumberExpiresAt:Date,
    
 });
 userSchema.pre('save', async function (next) {
@@ -85,6 +88,15 @@ userSchema.methods.createResetPasswordToken = function () {
     this.passwordResetTokenExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
     return resetToken;
 };
+userSchema.methods.generateAndEncryptValidationNumber = function () {
+    const randomNumber = Math.floor(10000000 + Math.random() * 90000000).toString(); // Convert to string
+    const cipher = crypto.createHash('sha256').update(randomNumber).digest('hex');
+    this.active="false";
+    this.encryptedValidationNumber = cipher;
+    this.validationNumberExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    return randomNumber; // Return the random number as a string
+};
+
 
 const User = mongoose.model('User',userSchema);
 module.exports = User;

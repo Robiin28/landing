@@ -33,26 +33,149 @@ const createSendResponse = (user, statusCode, res) => {
     });
 }
 exports.signup = asyncErrorHandler(async (req, res, next) => {
-
     newUser = await User.create(req.body);
     newUser.password = undefined;
     createSendResponse(newUser, 201, res);
-    // const token = signToken(newUser._id);
+});
+exports.validateEmail = asyncErrorHandler(async (req, res, next) => {
+    const { email } = req.body;
 
-    // res.status(201).json({
-    //     status: 'success',
-    //     token:token,
-    //     data: {
-    //         user:newUser
-    //     }
+    // Find the user by email
+    let user = await User.findOne({ email });
 
-    
-    // });
+    // If user already exists and is active, return an error
+    if (user && user.active) {
+        return next(new CustomErr("Email is already validated.", 400));
+    }
+
+    // Generate and store validation number
+    const validationNumber = user.generateAndEncryptValidationNumber();
+    user.validationNumberExpiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes validity
+
+    // Save the user with validation fields
+    await user.save({ validateBeforeSave: false });
+
+    try {
+        // Send email with validation number
+        const message = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Account Validation Number</title>
+                 <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f4f4f4;
+                margin: 0;
+                padding: 0;
+            }
+            .container {
+                background-color: #ffffff;
+                padding: 20px;
+                margin: 50px auto;
+                max-width: 600px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+            .header {
+                background-color: #4CAF50;
+                color: #ffffff;
+                padding: 10px 0;
+                text-align: center;
+            }
+            .content {
+                margin: 20px 0;
+                line-height: 1.6;
+            }
+            .button {
+                display: inline-block;
+                padding: 10px 20px;
+                font-size: 16px;
+                color: #ffffff;
+                background-color: #4CAF50;
+                text-decoration: none;
+                border-radius: 5px;
+            }
+            .number{
+                display:flex;
+                flex-direction:column;
+                text-align:center;
+                margin:auto;
+                color:black;
+                font:bold;
+                background-color:gray;
+                padding:10px;
+            }
+            .footer {
+                margin-top: 20px;
+                text-align: center;
+                color: #777777;
+            }
+        </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">    
+                        <h1>Email Validation Request</h1>
+                    </div>
+                    <div>
+                        <h1>Hi,</h1>
+                    </div>
+                    <div class="content">
+                            <p>Thanks for joining our family. Please use the number below to validate your account:</p>
+                            <p><span class="number">${validationNumber}</span></p>
+                            <p>If you did not request for validation, please ignore this email. This link will expire in 10 minutes.</p>
+                    </div>
+                    <div class="footer">
+                                 <p>&copy; 2024 Mineflix. All rights reserved.</p> 
+                    </div>
+                </div>
+            </body>
+            </html>
+        `;
+
+        await sendEmail({
+            email: user.email,
+            subject: 'Account Validation Number',
+            html: message
+        });
+
+        res.status(200).json({
+            status: 'success',
+            message: 'Account validation number sent to user email.'
+        });
+    } catch (err) {
+        console.error('Error sending email:', err); // Log the error for debugging
+
+        // Handle the error and respond with an appropriate error message
+        user.encryptedValidationNumber = undefined;
+        user.validationNumberExpiresAt = undefined;
+        await user.save({ validateBeforeSave: false });
+
+        return next(new CustomErr('There was an error sending the account validation number email. Please try again later.', 500));
+    }
+});
+exports.validateNow = asyncErrorHandler(async (req, res, next) => {
+    const { email, validationNumber } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+        return next(new CustomErr("Email not found. Please sign up first.", 404));
+    }
+    if (user.encryptedValidationNumber !== crypto.createHash('sha256').update(validationNumber.toString()).digest('hex')) {
+        return next(new CustomErr("Validation number is incorrect.", 400));
+    }
+    if (user.validationNumberExpiresAt && user.validationNumberExpiresAt < Date.now()) {
+        return next(new CustomErr("Validation number has expired. Please request a new one.", 400));
+    }
+    user.active = true;
+    user.encryptedValidationNumber = undefined;
+    user.validationNumberExpiresAt = undefined;
+    await user.save({ validateBeforeSave: false });
+    createSendResponse(user, 200, res);
 });
 exports.login=asyncErrorHandler(async (req, res, next)=>{
     const email = req.body.email;
     const password = req.body.password;
-
     if (!email || !password) {
         const error = new CustomErr("invalid email or password", 400);
         return next(error);
@@ -265,3 +388,9 @@ createSendResponse(user, 200, res);
     //     token: logToken
     // });
 });
+
+
+
+
+
+
