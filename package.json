@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "learning express js",
   "main": "app.js",
+  "proxy":"http://localhost:8000/",
+
   "scripts": {
     "start": "node server.js"
   },

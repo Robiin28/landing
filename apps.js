@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const authRouter = require('./routes/authRouter');
 const movieRouter = require('./routes/movieRoutes');
 const rateLimit = require('express-rate-limit');
+const cors =require('cors');
 const helmet = require('helmet');
 const hpp = require('hpp');
 const xxs=require('xss-clean');
@@ -11,12 +12,15 @@ const sanitize = require('express-mongo-sanitize');
 const userRouter = require('./routes/userRouter');
 const CustomErr = require('./Utils/CustomErr');
 const globalErrorHandler = require('./controller/errController');
-
-
 //middle ware
 
-
 app = express();
+app.use(cors({
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true // Include this if you need to send cookies or authentication headers
+}));
 
 app.use(helmet());
 
