@@ -8,6 +8,7 @@ import CreateProduct from './components/createProduct/CreateProduct';
 import Login from './components/login/Login';
 import SignUp from './components/signUp/sign-up';
 import MainHeader from './components/MainHeader';
+import Validate from './components/signUp/Validate';
 
 
 const movie = [
@@ -131,6 +132,7 @@ function App() {
   )}
 </main> */}
 <SignUp></SignUp>
+{/* <Validate></Validate> */}
         </>
     );
 }

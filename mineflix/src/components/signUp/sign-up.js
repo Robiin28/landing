@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 import '../login/login.css'; // Import the CSS file for this component
 import passwordValidator from 'password-validator';
 import './passwordStrengthMeter.css'; // Import CSS for PasswordStrengthMeter
+import Validate from './Validate'; // Import the Validate component
 
 // Define the schema for password validation
 const schema = new passwordValidator();
-
 schema
   .is().min(8)           // Minimum length 8
   .is().max(100)         // Maximum length 100
@@ -15,10 +16,11 @@ schema
   .has().symbols()       // Must have symbols
   .has().not().spaces(); // Should not have spaces
 
-const SignUp = (props) => {
-    let nameRef = useRef();
-    let emailRef = useRef();
-    let passRef = useRef();
+const SignUp = () => {
+    const nameRef = useRef();
+    const emailRef = useRef();
+    const passRef = useRef();
+    const conPassRef = useRef();
 
     const [enteredName, setEnteredName] = useState('');
     const [enteredEmail, setEnteredEmail] = useState('');
@@ -29,6 +31,8 @@ const SignUp = (props) => {
     const [passwordIsValid, setPasswordIsValid] = useState(true);
     const [confirmedPasswordIsValid, setConfirmedPasswordIsValid] = useState(true);
     const [formIsValid, setFormIsValid] = useState(false);
+    const [serverError, setServerError] = useState(null);
+    const [signedUp, setSignedUp] = useState(false); // Track signup success
 
     useEffect(() => {
         const isNameValid = /^[A-Za-z][A-Za-z0-9]{6,}$/.test(enteredName);
@@ -68,22 +72,43 @@ const SignUp = (props) => {
         setConfirmedPasswordIsValid(enteredPassword === event.target.value);
     };
 
-    const submitHandler = (event) => {
+    const submitHandler = async (event) => {
         event.preventDefault();
-            let user = {
-                name: nameRef.current.value,
-                email: emailRef.current.value,
-                password: passRef.current.value
-            };
-            console.log(user);
-            // props.onLogin(enteredEmail, enteredPassword, enteredName)
-       
-            // setNameIsValid(/^[A-Za-z][A-Za-z0-9]{6,}$/.test(enteredName));
-            // setEmailIsValid(/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(enteredEmail));
-            // setPasswordIsValid(schema.validate(enteredPassword));
-            // setConfirmedPasswordIsValid(enteredPassword === confirmedPassword);
-        
+
+        const newUser = {
+            name: enteredName,
+            email: enteredEmail,
+            password: enteredPassword,
+            confirmPassword: confirmedPassword
+        };
+
+        try {
+            const response = await axios.post('http://127.0.0.1:5000/api/v1/auth/signup', newUser, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            console.log('Sign-up successful:', response.data);
+            setSignedUp(true); // Set signedUp to true upon successful signup
+            setServerError(null);
+        } catch (error) {
+            if (error.response) {
+                console.error('Sign-up failed:', error.response.data);
+                setServerError(error.response.data.message || 'Unknown error');
+            } else if (error.request) {
+                console.error('Sign-up failed: No response received', error.request);
+                setServerError('Network error');
+            } else {
+                console.error('Sign-up failed:', error.message);
+                setServerError('Unknown error');
+            }
+        }
     };
+
+    if (signedUp) {
+        return <Validate email={enteredEmail} />; // Render Validate component upon successful signup
+    }
 
     const calculatePasswordStrength = (password) => {
         let strength = 0;
@@ -119,7 +144,6 @@ const SignUp = (props) => {
                         id="name"
                         type="text"
                         ref={nameRef}
-                        pattern="^[A-Za-z][A-Za-z0-9]{6,}$"
                         title="Enter a valid name (e.g., JohnDoe123)"
                         placeholder="Enter your name"
                         onChange={handleChange(setEnteredName)}
@@ -134,7 +158,6 @@ const SignUp = (props) => {
                         id="email"
                         type="email"
                         ref={emailRef}
-                        pattern="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
                         title="Enter a valid email address (e.g., someone@example.com)"
                         placeholder="Enter your email"
                         onChange={handleChange(setEnteredEmail)}
@@ -172,6 +195,7 @@ const SignUp = (props) => {
                     <input
                         id="confirmPassword"
                         type="password"
+                        ref={conPassRef}
                         placeholder="Confirm your password"
                         onChange={handleConfirmedPasswordChange}
                         onBlur={handleConfirmedPasswordBlur}
@@ -179,6 +203,7 @@ const SignUp = (props) => {
                     />
                     {!confirmedPasswordIsValid && <p className="error-text">Passwords do not match.</p>}
                 </div>
+                {serverError && <p className="error-text">{serverError}</p>}
                 <button
                     className={'btn'}
                     type="submit"
